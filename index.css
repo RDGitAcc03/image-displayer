@@ -1,8 +1,8 @@
 div#searchContainer {
-    border: 1px solid;
+    /* border: 1px solid; */
     position: relative;
     width: 50vw;
-    padding: 0 0 0 8px;
+    /* padding: 0 0 0 8px; */
     height: 5vh;
     border-radius: 40px;
     display: flex;
@@ -11,26 +11,31 @@ div#searchContainer {
 
 i[class*="fa-solid"] {
     position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
+    top: 0.6rem;
+    left: 1rem;
     cursor: pointer;
+    font-size: 15px;
+    vertical-align: middle;
+    align-self: center;
 }
 
 
 input#searchInput {
     width: 50vw;
-    padding: 0 10px 0 25px;
+    padding: 0 10px 0 40px;
     height: 5vh;
     border-radius: 40px;
     box-shadow: 0 4px 12px rgba(10, 10, 10, 0.08);
     border: 1px solid #ebecf0;
+    /* border: 1px solid; */
 }
 
-input#searchInput:focus{
+input#searchInput:focus {
     outline: none;
 }
 
 div#imageList {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     justify-content: center;
@@ -39,7 +44,7 @@ div#imageList {
     margin: 5rem auto;
 }
 
-div#imageList img {
+div#imageList > .imageContainer > img {
     width: 100%;
     height: 100%;
     image-resolution: 500dpi;
@@ -47,9 +52,10 @@ div#imageList img {
     transition: 0.3s ease-out;
 }
 
-div#imageList img:hover {
+div#imageList > .imageContainer > img:hover {
     width: 125%;
     height: 125%;
+    cursor: pointer;
 }
 
 div.imageContainer {
@@ -59,12 +65,60 @@ div.imageContainer {
 }
 
 div.modal {
-    border: 1px solid;
-    width: 300px;
-    height: 300px;
+    position: fixed;
+    left: 35%;
+    top: 22%;
+    /* border: 1px solid #ebecf0; */
+    width: 350px;
+    height: 350px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    background-color: #fff;
+    box-shadow: 0 0 0 50vmax rgba(0,0,0,.5);
+    z-index: 10000;
 }
+
+i[class*='regular']{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    color: #fff;
+    cursor: pointer;
+}
+
+div.modal > div:first-child {
+    /* border: 5px solid; */
+    position: relative;
+    height: calc(350px / 2);
+}
+
+div.modal > div:first-child > img {
+    /* border: 4px solid orange; */
+    width: 100%;
+    height: 100%;
+}
+
+div.modal > div:first-child > img:hover{
+    width: 100%;
+    height: 100%;
+}
+
+div.modal > div:nth-child(2) {
+    /* border: 1px solid purple; */
+    height: calc(350px / 2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif, monospace;
+}
+
+div.modal p {
+    margin: 0.3rem;
+}
+
 
 h1#heading {
     display: flex;
