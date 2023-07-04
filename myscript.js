@@ -2,7 +2,7 @@ const searchInput = document.getElementById('searchInput');
 const searchButton = document.getElementById('iconContainer');
 const imageList = document.getElementById('imageList');
 
-let category, timeout, modal, modalTopPart, modalBottomPart, isModalClosed = true;
+let search, timeout, modal, modalTopPart, modalBottomPart, isModalClosed = true;
 
 function handleDebounceInputCapture() {
     timeout = setTimeout(() => {
@@ -11,22 +11,31 @@ function handleDebounceInputCapture() {
 }
 
 function handleSearchInput(cb) {
-    category = searchInput.value;
+    search = searchInput.value;
     cb(timeout);
-    console.log(category);
+    console.log(search);
 }
 
 function handleSearchClick() {
     const MY_API_KEY = '31161391-10c38618ac342ad384660a321';
-    const api = `https://pixabay.com/api/?key=${MY_API_KEY}&q=${category}&per_page=20`;
+    search = search.replace(' ', '+');
+    console.log("search after convertion: ", search);
+    const api = `https://pixabay.com/api/?key=${MY_API_KEY}&q=${search}&image_type=photo&per_page=20`;
 
     const controller = new AbortController();
 
     fetch(api, { signal: controller.signal })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            createImageList(data.hits);
+            if (data) {
+                if (data.total === 0) {
+                    handleUnfoundSearch();
+                }
+                else {
+                    createImageList(data.hits);
+                }
+                console.log(data);
+            }
         })
         .catch(err => console.log(err))
     setTimeout(() => {
@@ -34,8 +43,21 @@ function handleSearchClick() {
     }, 1000)
 }
 
+function handleUnfoundSearch() {
+    imageList.innerHTML = "";
+    search = search.replace('+', ' ');
+    const htmlContent =
+        `<h1>${search}</h1>
+        <p>Sorry, we couldn't find any matches</p>
+        `;
+    imageList.innerHTML = htmlContent;
+    imageList.setAttribute('id', '');
+    imageList.classList.add('imageListUnfound');
+}
+
 function createImageList(data) {
     imageList.innerHTML = "";
+    imageList.setAttribute('id', 'imageList');
     data.forEach(img => {
         const image = document.createElement('img');
         if (image) {
@@ -72,7 +94,7 @@ function handleOpenModalOnImageClick(img, imgInfo) {
             modalBottomPart = document.createElement('div');
             modal.appendChild(modalTopPart);
 
-            modal.appendChild(modalBottomPart); 
+            modal.appendChild(modalBottomPart);
             if (modalTopPart) {
                 modalTopPart.appendChild(newImage);
                 modalTopPart.innerHTML += '<i class="close fa-regular fa-rectangle-xmark"></i>';
