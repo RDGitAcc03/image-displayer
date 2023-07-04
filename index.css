@@ -41,7 +41,7 @@ div#imageList {
     justify-content: center;
     flex-wrap: wrap;
     width: 65vw;
-    margin: 5rem auto;
+    margin: 5rem auto 2rem auto;
 }
 
 .imageListUnfound {
@@ -134,4 +134,23 @@ h1#heading {
     justify-content: center;
     margin-top: 4vh;
     /* border: 1px solid; */
+}
+
+div#moreImages {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+div#moreImages > button {
+    width: 250px;
+    height: 40px;
+    background-color: #00ab6b;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+div#moreImages > button:hover{
+    background-color: #07794f;
 }
