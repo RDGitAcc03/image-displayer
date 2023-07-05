@@ -4,7 +4,7 @@ const imageList = document.getElementById('imageList');
 const buttonLoadMoreImages = document.getElementById('buttonLoadMoreImages');
 
 let search, timeout, modal, modalTopPart, modalBottomPart, isModalClosed = true, images = [],
-    page = 24, pageSize = 19, isLoadButtonVisible = "none";
+    page = 1, pageSize = 20, isLoadButtonVisible = "none", loadMoreClickCounter = 1;
 
 
 function handleDebounceInputCapture() {
@@ -16,12 +16,20 @@ function handleDebounceInputCapture() {
 function handleSearchInput(cb) {
     search = searchInput.value;
     cb(timeout);
-    console.log(search);
 }
 
 function handleLoadNextPage() {
     page++;
-    handleSearchClick();
+    handleSearchApi().then(data => {
+        if (data.total === 0) {
+            images = [];
+        }
+        if (data && page > 1) {
+            images.push(data.hits);
+        }
+        handleShowLoadButton(data);
+        createImageList();
+    });
 }
 
 if (buttonLoadMoreImages) {
@@ -33,47 +41,38 @@ if (buttonLoadMoreImages) {
 function handleShowLoadButton(data) {
     const totalImages = data.totalHits;
     const pages = Math.floor(totalImages / pageSize) + 1;
-    if (page === pages) {
+    if (data.total === 0 || page === pages) {
         isLoadButtonVisible = "none";
     }
     else {
         isLoadButtonVisible = "block";
-        console.log("last page = ", pages);
     }
     buttonLoadMoreImages.style.setProperty('display', isLoadButtonVisible);
 }
 
 
-function handleSearchClick() {
+async function handleSearchApi() {
     const MY_API_KEY = '31161391-10c38618ac342ad384660a321';
     search = search.replace(' ', '+');
-    console.log("search after convertion: ", search);
     const api = `https://pixabay.com/api/?key=${MY_API_KEY}&q=${search}&page=${page}&image_type=photo&per_page=${pageSize}`;
 
     const controller = new AbortController();
 
-    fetch(api)
+    setTimeout(() => {
+        controller.abort();
+    }, 1000);
+
+    return fetch(api)
         .then(response => response.json())
         .then(data => {
             if (data) {
-                if (data.total === 0) {
-                    handleUnfoundSearch();
-                }
-                else {
-                    images.push(data.hits);
-                    createImageList(images);
-                }
-                handleShowLoadButton(data);
-                console.log(data);
+                return data;
             }
         })
         .catch(err => console.log(err))
-    setTimeout(() => {
-        controller.abort();
-    }, 1000)
 }
 
-function handleUnfoundSearch() {
+async function handleUnfoundSearch() {
     imageList.innerHTML = "";
     search = search.replace('+', ' ');
     const htmlContent =
@@ -86,10 +85,14 @@ function handleUnfoundSearch() {
 }
 
 function createImageList() {
-    console.log("page: ", page);
     images = images.flat();
     imageList.innerHTML = "";
-    imageList.setAttribute('id', 'imageList');
+    if (images.length === 0) {
+        handleUnfoundSearch();
+    } else {
+        imageList.setAttribute('id', 'imageList');
+        imageList.classList.remove('imageListUnfound');
+    }
     images.forEach(img => {
         const image = document.createElement('img');
         if (image) {
@@ -159,10 +162,25 @@ if (searchInput) {
         if (e.key === 'Enter') {
             e.preventDefault();
             handleDebounceInputCapture();
-            handleSearchClick();
+            loadFirstPage();
         }
     });
 }
+
 if (searchButton) {
-    searchButton.addEventListener('click', handleSearchClick);
+    searchButton.addEventListener('click', loadFirstPage);
+}
+
+async function loadFirstPage() {
+    page = 1;
+    handleSearchApi().then(data => {
+        if (data.total === 0) {
+            images = [];
+        }
+        else {
+            images = data.hits;
+        }
+        handleShowLoadButton(data);
+        createImageList();
+    })
 }
